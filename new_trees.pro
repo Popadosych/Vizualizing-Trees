@@ -36,7 +36,9 @@ HEADERS += \
         widget.h \
     CustomQGraphicsScene.h \
     univertex.h \
-    rbt.h
+    rbt.h \
+    node.h \
+    dekart_avl_trees.h
 
 FORMS += \
         widget.ui

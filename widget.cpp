@@ -11,7 +11,6 @@ Widget::Widget(QWidget *parent)
     ui->setupUi(this);
     setFixedSize(1300, 750);
     setWindowTitle(QString("Trees"));
-    //setStyleSheet("MainWindow{background-color: rgb(255, 255, 255)};");
 
     mainScene = new CustomQGraphicsScene();
 
@@ -30,10 +29,10 @@ Widget::Widget(QWidget *parent)
     add->setStyleSheet("background-color: rgb(255, 255, 255);");
     connect(add, SIGNAL(clicked()), this, SLOT(addElem()));
 
-    randd = new QPushButton("Add some rand");
-    randd->setFont(mainFont);
-    randd->setStyleSheet("background-color: rgb(255, 255, 255);");
-    connect(randd, SIGNAL(clicked()), this, SLOT(addRand()));
+    rand_but = new QPushButton("Add some rand");
+    rand_but->setFont(mainFont);
+    rand_but->setStyleSheet("background-color: rgb(255, 255, 255);");
+    connect(rand_but, SIGNAL(clicked()), this, SLOT(addRand()));
 
     clear = new QPushButton("Clear tree");
     clear->setFont(mainFont);
@@ -47,12 +46,12 @@ Widget::Widget(QWidget *parent)
 
     horizontal_slider = new QSlider(Qt::Horizontal);
 
-    combo_wombo = new QComboBox();
-    combo_wombo->addItem("AVL Tree");
-    combo_wombo->addItem("Dekart Tree");
-    combo_wombo->addItem("Red-Black Tree");
-    combo_wombo->setFont(mainFont);
-    connect(combo_wombo, SIGNAL(currentTextChanged(const QString&)), this, SLOT(on_combo_wombo_curentTextChanged(const QString&)));
+    combo_box = new QComboBox();
+    combo_box->addItem("AVL Tree");
+    combo_box->addItem("Dekart Tree");
+    combo_box->addItem("Red-Black Tree");
+    combo_box->setFont(mainFont);
+    connect(combo_box, SIGNAL(currentTextChanged(const QString&)), this, SLOT(on_combo_wombo_curentTextChanged(const QString&)));
 
 
     vertex = new QLineEdit;
@@ -72,14 +71,13 @@ Widget::Widget(QWidget *parent)
     mainLayout->addWidget(vertex, 20, 100, 5, 10);
     mainLayout->addWidget(add, 25, 100, 10, 10);
     mainLayout->addWidget(quant, 40, 100, 5, 10);
-    mainLayout->addWidget(randd, 45, 100, 10, 10);
+    mainLayout->addWidget(rand_but, 45, 100, 10, 10);
     mainLayout->addWidget(delline, 60, 100, 5, 10);
     mainLayout->addWidget(del, 65, 100, 10, 10);
     mainLayout->addWidget(clear, 80, 100, 10, 10);
     mainLayout->addWidget(horizontal_slider, 90, 100, 10, 10);
-    mainLayout->addWidget(combo_wombo, 5, 100, 15, 10);
+    mainLayout->addWidget(combo_box, 5, 100, 15, 10);
     this->setLayout(mainLayout);
-    //setCentralWidget(mCentralWidget);
 }
 
 void Widget::addElem() {
@@ -93,8 +91,8 @@ void Widget::addElem() {
     try {
         if (!atree._checker(atree.get_tree(), key)) return;
         atree.insert(key);
-        Node* opa = new Node(key);
-        Node* res = dtree.insert(dtree.get_tree(), opa);
+        Node* new_node = new Node(key);
+        Node* res = dtree.insert(dtree.get_tree(), new_node);
         dtree.root = res;
         rbtree->insert(rbtree, key);
     }
@@ -102,7 +100,7 @@ void Widget::addElem() {
         return;
     }
     renderTree();
-    auto e = combo_wombo->currentText();
+    auto e = combo_box->currentText();
     if (e == "AVL Tree") renderLines(atree.get_tree());
     else if (e == "Dekart Tree") renderLines(dtree.get_tree());
     else if (e == "Red-Black Tree") renderLines_RBT(rbtree);
@@ -117,15 +115,15 @@ void Widget::addRand() {
     catch(...) {
         return;
     }
-    for (int ii = 0; ii < n; ++ii) {
+    for (int i = 0; i < n; ++i) {
         int key = (rand() % right + left) % right;
         while (!atree._checker(atree.root, key)) {
             key = (rand() % right + left) % right;
         }
         try {
             atree.insert(key);
-            Node* opa = new Node(key);
-            Node* res = dtree.insert(dtree.get_tree(), opa);
+            Node* new_node = new Node(key);
+            Node* res = dtree.insert(dtree.get_tree(), new_node);
             dtree.root = res;
             rbtree->insert(rbtree, key);
         }
@@ -134,7 +132,7 @@ void Widget::addRand() {
         }
     }
     renderTree();
-    auto e = combo_wombo->currentText();
+    auto e = combo_box->currentText();
     if (e == "AVL Tree") renderLines(atree.get_tree());
     else if (e == "Dekart Tree") renderLines(dtree.get_tree());
     else if (e == "Red-Black Tree") renderLines_RBT(rbtree);
@@ -152,7 +150,6 @@ void Widget::delElem() {
 }
 
 void Widget::delete_elem(int key) {
-    qDebug() << "gavnina";
     if (atree.height() == 1) {
         clearTree();
         return;
@@ -161,14 +158,14 @@ void Widget::delete_elem(int key) {
     rbtree->erase(rbtree, key);
     Node* res;
     if (dtree.get_tree()->key == key) {
-        res = dtree.erase_for_dauns(dtree.get_tree(), key);
+        res = dtree.erase(dtree.get_tree(), key);
     }
     else {
         res = dtree.erase(dtree.get_tree(), key);
     }
     dtree.root = res;
     renderTree();
-    auto e = combo_wombo->currentText();
+    auto e = combo_box->currentText();
     if (e == "AVL Tree") renderLines(atree.get_tree());
     else if (e == "Dekart Tree") renderLines(dtree.get_tree());
     else if (e == "Red-Black Tree") renderLines_RBT(rbtree);
@@ -186,12 +183,12 @@ void Widget::clearTree() {
 void Widget::renderTree() {
     mainScene->clear();
     mainScene->update();
-    auto e = combo_wombo->currentText();
-    if (e == "AVL Tree") {
+    auto mode = combo_box->currentText();
+    if (mode == "AVL Tree") {
         int prev = 0;
         for (auto elem = atree.begin(); elem != atree.end(); elem = elem->next()) {
             auto x = prev++ * 150;
-            auto y = elem->hail * 150;
+            auto y = elem->height * 150;
             auto xe = x - 15 - 5 * (10 - QString::number(elem->key).size());
             elem->high = {xe+125, y};
             elem->low = {xe+125, y + 30};
@@ -200,19 +197,17 @@ void Widget::renderTree() {
             e->color = 2;
             e->value = elem->key;
 
-    //        auto t = new QGraphicsTextItem(QString::number(elem->key));
-    //        t->setFont(mainFont);
+
             e->setX(x);
             e->setY(y);
             e->setZValue(1000);
             mainScene->addItem(e);
-    //        mainScene->addItem(t);
         }
-    } else if (e == "Dekart Tree") {
+    } else if (mode == "Dekart Tree") {
         int prev = 0;
         for (auto elem = dtree.begin(); elem != dtree.end(); elem = elem->next()) {
             auto x = prev++ * 150;
-            auto y = elem->hail * 150;
+            auto y = elem->height * 150;
             auto xe = x - 15 - 5 * (10 - QString::number(elem->key).size());
             elem->high = {xe+125, y};
             elem->low = {xe+125, y + 30};
@@ -221,21 +216,19 @@ void Widget::renderTree() {
             e->color = 3;
             e->value = elem->key;
 
-    //        auto t = new QGraphicsTextItem(QString::number(elem->key));
-    //        t->setFont(mainFont);
             e->setX(x);
             e->setY(y);
             e->setZValue(1000);
             mainScene->addItem(e);
         }
-    } else if (e == "Red-Black Tree") {
+    } else if (mode == "Red-Black Tree") {
         if (rbtree == nullptr) return;
         int prev = 0;
         rbtree->par = nullptr;
         rbtree->recountParents(rbtree);
         for (auto elem = rbtree->begin(); elem != nullptr; elem = elem->next(elem)) {
             auto x = prev++ * 150;
-            auto y = elem->hail * 150;
+            auto y = elem->height_ * 150;
             auto xe = x - 15 - 5 * (10 - QString::number(elem->elem()).size());
             elem->high = {xe+125, y};
             elem->low = {xe+125, y + 30};
@@ -249,13 +242,11 @@ void Widget::renderTree() {
             e->setY(y);
             e->setZValue(1000);
             mainScene->addItem(e);
-            qDebug() << elem->elem();
         }
     }
 }
 
 void Widget::renderLines(Node* p) {
-    qDebug() << "Presidennnnntttttt is waiting for U";
     if (p == nullptr) {
         return;
     }
@@ -301,4 +292,3 @@ Widget::~Widget()
 {
     delete ui;
 }
-

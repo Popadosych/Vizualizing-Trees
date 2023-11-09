@@ -8,7 +8,6 @@ UniVertex::UniVertex()
 QRectF UniVertex::boundingRect() const {
 
     return QRectF(0, 0, width, height);
-//    return QRectF(-50, -50, 100, 100);
 }
 
 

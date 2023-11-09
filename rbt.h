@@ -1,5 +1,3 @@
-#ifndef RBT_H
-#define RBT_H
 #include <bits/stdc++.h>
 using std::swap;
 using std::max;
@@ -8,8 +6,8 @@ using std::max;
 
 
 class RBT {
- public:
-    RBT(int elem) : elem_(elem), red_(0), left(nullptr), right(nullptr), par(nullptr), hail(0) {}
+public:
+    RBT(int elem) : elem_(elem), red_(0), left(nullptr), right(nullptr), par(nullptr), height_(0) {}
     RBT() {}
     ~RBT() {}
     RBT(const RBT &other) : elem_(other.elem_), red_(other.red()), left(other.left ? new RBT(*other.left) : nullptr), right(other.right ? new RBT(*other.right) : nullptr) {}
@@ -17,6 +15,7 @@ class RBT {
     bool red() const { return this ? this->red_ : 0; }
     int height() { return this ?  max(right->height(), left->height()) + 1 : 0; }
     int width() { return this ? max(left->width() + right->width(), 1) : 0; }
+
     friend void SLR(RBT* &p) {
         RBT* q = p->right;
         p->right = q->left;
@@ -24,6 +23,7 @@ class RBT {
         swap(p->red_, q->red_);
         p = q;
     }
+
     void SRR(RBT* &p) {
         RBT* q = p->left;
         p->left = q->right;
@@ -31,6 +31,7 @@ class RBT {
         swap(p->red_, q->red_);
         p = q;
     }
+
     void insert(RBT* &p, int elem, RBT** D = nullptr, RBT** G = nullptr, RBT** U = nullptr) {
         if (p == nullptr) {
             p = new RBT(elem);
@@ -65,6 +66,7 @@ class RBT {
             }
         }
     }
+
     RBT* find_min() {return this->left ? this->left->find_min() : this; }
     bool evil_flex_left(RBT* &p) {
         RBT* B = p->right;
@@ -96,6 +98,7 @@ class RBT {
         }
         return 0;
     }
+
     bool evil_flex_right(RBT* &p) {
         RBT* B = p->left;
         if (!B) return 0;
@@ -134,6 +137,7 @@ class RBT {
         }
         return 0;
     }
+
     bool remove_min(RBT* &p) {
         if (p->left != nullptr)
             return remove_min(p->left) ? evil_flex_left(p) : 0;
@@ -151,6 +155,7 @@ class RBT {
         p = nullptr;
         return 1;
     }
+
     bool erase(RBT* &p, int elem) {
         if (p == nullptr) return 0;
         if (p->elem_ > elem) {
@@ -217,18 +222,18 @@ class RBT {
     RBT* begin() {
         RBT *min = this;
         if (min == nullptr) return nullptr;
-        int hhh = 1;
+        int height = 1;
         while (min != nullptr && min->left != nullptr) {
             min = min->left;
-            ++hhh;
+            ++height;
         }
-        min->hail = hhh;
+        min->height_ = height;
         return min;
     }
 
     RBT* next(RBT*& root) {
         RBT* p;
-        int hhh = root->hail;
+        int hhh = root->height_;
         if (root->right != nullptr) {
             p = root->right;
             ++hhh;
@@ -236,20 +241,19 @@ class RBT {
                 p = p->left;
                 ++hhh;
             }
-            p->hail = hhh;
+            p->height_ = hhh;
             return p;
         }
         p = root;
         while (p->par != nullptr) {
             if (p->par->left == p) {
                 --hhh;
-                p->par->hail = hhh;
+                p->par->height_ = hhh;
                 return p->par;
             }
             p = p->par;
             --hhh;
         }
-        qDebug() << "OMGGG NULLPTR";
         return nullptr;
     }
 
@@ -257,11 +261,8 @@ class RBT {
         return nullptr;
     }
 
-    int elem_, hail;
+    int elem_, height_;
     bool red_;
     RBT* left, *right, *par;
     QPoint low, high;
 };
-
-
-#endif // RBT_H

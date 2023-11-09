@@ -1,5 +1,3 @@
-#ifndef CUSTOMQGRAPHICSSCENE_H
-#define CUSTOMQGRAPHICSSCENE_H
 #include <QGraphicsScene>
 #include <univertex.h>
 #include <QPoint>
@@ -11,16 +9,12 @@ class CustomQGraphicsScene : public QGraphicsScene
 
     Q_OBJECT
 
-signals:
-    void sig(int);
-public:
-//    Widget* widj;
+            signals:
+            void sig(int);
 protected:
-   bool pressed = false;
-   QPointF prev;
-   void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
-   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    bool pressed = false;
+    QPointF prev;
+    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 };
-
-#endif // CUSTOMQGRAPHICSSCENE_H

@@ -1,4 +1,4 @@
-    #include <string>
+#include <string>
 #include "widget.h"
 
 void recountParents(Node*& p) {

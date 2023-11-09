@@ -131,15 +131,3 @@ Node* Dekart_tree::erase(Node* root, int key) {
     recountParents(root);
     return root;
 }
-
-Node* Dekart_tree::erase_for_dauns(Node* root, int key) {
-    if (root == nullptr) {
-        return nullptr;
-    }
-    Node* ans = _merge(root->left, root->right);
-    ans->parent = nullptr;
-    recountParents(ans);
-    recountParents(ans->left);
-    recountParents(ans->right);
-    return ans;
-}

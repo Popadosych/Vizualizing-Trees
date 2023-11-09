@@ -1,25 +1,20 @@
 #include "CustomQGraphicsScene.h"
 #include <QPainter>
-#include <QDebug>
 
 void CustomQGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    //qDebug() << "in";
     if (mouseEvent->button() == Qt::LeftButton)
     {
 
-        QGraphicsItem *item = itemAt(mouseEvent->scenePos(), QTransform());// it is your clicked item, you can do everything what you want. for example send it somewhere
+        QGraphicsItem *item = itemAt(mouseEvent->scenePos(), QTransform());
         UniVertex *vert = dynamic_cast<UniVertex *>(item);
         if(vert != nullptr)
         {
-            qDebug() << "   eeeeell" << vert->value;
-              emit sig(vert->value);
-//            vert->br->setColor("yellow");
+            emit sig(vert->value);
 
         } else{
             pressed = true;
             prev = mouseEvent->pos();
-            qDebug() << "  notffsdfa ell" << mouseEvent->scenePos();
         }
     }
 
